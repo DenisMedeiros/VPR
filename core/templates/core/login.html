@@ -1,0 +1,64 @@
+{% extends 'core/base-login.html' %}
+{% load static %}
+
+{% block 'title' %} Log in {% endblock %}
+
+{% block 'body' %}
+
+<main class="form-signin">
+  <form method="post">{% csrf_token %}
+    <img class="mb-4" src="{% static 'core/img/icon.png' %}" alt="" width="80" height="80">
+    <h1 class="h3 mb-3 fw-normal">VPR Login</h1>
+
+    {% if messages %} 
+    {% for message in messages %}
+    <div class="col-xs-12">
+      <div class="alert {% if message.tags %} {{ message.tags }} {% endif %} alert-dismissible fade show" role="alert">
+        <div>
+        {% if message.level == 20 %}
+        <i data-feather="info"></i>
+        {% elif message.level == 25 %}
+        <i data-feather="check-circle"></i>
+        {% elif message.level == 30 %}
+        <i data-feather="alert-triangle"></i>
+        {% elif message.level == 40 %}
+        <i data-feather="x-octagon"></i>
+        {% endif %} 
+          {{ message }}
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+    {% endfor %} 
+    {% endif %}
+
+    <div class="form-floating">
+      {{ form.username }}
+      <label for="{{ form.username.auto_id }}"> {{ form.username.label }} </label>
+    </div>
+
+    <div class="form-floating">
+      {{ form.password }}
+      <label for="{{ form.password.auto_id }}"> {{ form.password.label }} </label>
+    </div>       
+
+    <div class="form-check form-switch checkbox mb-3 mt-3 center">
+      <label>
+        {{ form.remember }} {{ form.remember.label }}
+      </label>
+    </div>
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+    <p class="mt-5 mb-3 text-muted">v.2021.05.12</p>
+  </form>
+</main>
+
+{% endblock %}
+
+{% block 'js' %}
+<!-- Icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+<script>
+  feather.replace()
+</script> 
+{% endblock %}

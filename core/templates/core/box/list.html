@@ -1,0 +1,58 @@
+{% extends 'core/base-page.html' %}
+
+{% block 'title' %}
+{% block 'body-title' %} List Boxes {% endblock %}
+{% endblock %}
+
+{% block 'body' %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Creator</th>
+      <th scope="col">Public</th>
+      <th scope="col">Downloads</th>
+      <th scope="col">Last Download At</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for box in boxes %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ box.name }}</td>
+      <td>{{ box.creator }}</td>
+      <td>{% if box.public %}<i data-feather="check"></i>{% endif %}</td>
+      <td>{{ box.downloads }}</td>
+      <td>{% if box.last_download_at %}{{ box.last_download_at }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+        <td class="text-center" colspan="6"> 
+
+        {% if page_obj.number != 1 %}
+        <a class="badge bg-secondary" href="?page=1"><i data-feather="chevrons-left"></i></a>
+        {% endif %}
+
+        {% if page_obj.has_previous %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.previous_page_number }}"><i data-feather="chevron-left"></i></a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.next_page_number }}"><i data-feather="chevron-right"></i></a>
+        {% endif %}
+        
+        {% if page_obj.number != page_obj.paginator.num_pages %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.paginator.num_pages }}"><i data-feather="chevrons-right"></i></a>
+        {% endif %}
+
+        </td>
+    </tr>
+  </tfoot>  
+</table>
+
+<br />
+{% endblock %}

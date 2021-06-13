@@ -1,0 +1,60 @@
+{% extends 'core/base-page.html' %}
+
+{% block 'title' %}
+{% block 'body-title' %} List Box Versions of "{{ box.name }}" {% endblock %}
+{% endblock %}
+
+{% block 'body' %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Kind</th>
+      <th scope="col">Description</th>
+      <th scope="col">Created At</th>
+      <th scope="col">Hash</th>
+      <th scope="col">File</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for version in box_versions %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ version.name }}</td>
+      <td>{{ version.kind }}</td>
+      <td>{{ version.description }}</td>
+      <td>{{ version.created_at }}</td>
+      <td>{{ version.hash }}</td>
+      <td>{{ version.file }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+        <td class="text-center" colspan="7"> 
+
+        {% if page_obj.number != 1 %}
+        <a class="badge bg-secondary" href="?page=1"><i data-feather="chevrons-left"></i></a>
+        {% endif %}
+
+        {% if page_obj.has_previous %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.previous_page_number }}"><i data-feather="chevron-left"></i></a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.next_page_number }}"><i data-feather="chevron-right"></i></a>
+        {% endif %}
+        
+        {% if page_obj.number != page_obj.paginator.num_pages %}
+        <a class="badge bg-secondary" href="?page={{ page_obj.paginator.num_pages }}"><i data-feather="chevrons-right"></i></a>
+        {% endif %}
+
+        </td>
+    </tr>
+  </tfoot>  
+</table>
+
+<br />
+{% endblock %}

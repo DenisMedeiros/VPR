@@ -1,0 +1,19 @@
+{% extends 'core/base-login.html' %}
+{% load static %}
+
+{% block 'title' %} Log out {% endblock %}
+
+{% block 'body' %}
+<main class="form-signin">
+  <h4> You have been logged out. </h4>
+  <p> Redirecting... </p>
+</main>
+{% endblock %}
+
+{% block 'js' %}
+<script>
+  setTimeout(function(){
+    window.location.href = '/';
+  }, 3000);
+</script>
+{% endblock %}
