@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 
 from . import models, forms
+from . import utils
 # Create your views here.
 
 class LoginView(FormView):
@@ -81,7 +82,7 @@ class BoxListView(ListView):
     model = models.Box
     template_name = 'core/box/list.html'
     context_object_name = 'boxes'
-    paginate_by = 3
+    paginate_by = 10
     ordering = '-pk'
 
     def get_queryset(self):
@@ -101,15 +102,91 @@ class BoxVersionListView(ListView):
     model = models.BoxVersion
     template_name = 'core/box-version/list.html'
     context_object_name = 'box_versions'
-    paginate_by = 3
+    paginate_by = 10
     ordering = '-pk'
 
     def get(self, request, **kwargs):
-        pk = kwargs.pop("pk")
-        self.box = get_object_or_404(models.Box, pk=pk)
+        box_pk = kwargs.pop("box")
+        self.box = get_object_or_404(models.Box, pk=box_pk)
         return super().get(request, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["box"] = self.box
         return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(box__creator=self.request.user)
+
+@method_decorator(login_required, name='dispatch')
+class BoxVersionCreateView(SuccessMessageMixin, CreateView):
+    model = models.BoxVersion
+    template_name = 'core/box-version/create.html'
+    form_class = forms.BoxVersionForm
+    success_message = 'Box version created successfuly.'
+
+    def get(self, request, **kwargs):
+        box_pk = kwargs.pop("box")
+        self.box = get_object_or_404(models.Box, pk=box_pk)
+        return super().get(request, **kwargs)
+
+    def post(self, request, **kwargs):
+        box_pk = kwargs.pop("box")
+        self.box = get_object_or_404(models.Box, pk=box_pk)
+        return super().post(request, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'core:box-version-list', kwargs={'box': self.box.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["box"] = self.box
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.box = self.box
+        self.object.save()
+        # Generate hash.
+        self.object.hash = utils.generate_sha256(self.object.file.path)
+        self.object.save()
+        return redirect(self.get_success_url())
+
+@method_decorator(login_required, name='dispatch')
+class BoxVersionEditView(UpdateView):
+    model = models.BoxVersion
+    template_name = 'core/box-version/edit.html'
+    form_class = forms.BoxVersionForm
+    success_message = 'Box version edited successfuly.'
+
+    def get(self, request, **kwargs):
+        box_pk = kwargs.pop("box")
+        self.box = get_object_or_404(models.Box, pk=box_pk)
+        return super().get(request, **kwargs)
+
+    def post(self, request, **kwargs):
+        box_pk = kwargs.pop("box")
+        self.box = get_object_or_404(models.Box, pk=box_pk)
+        return super().post(request, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'core:box-version-list', kwargs={'box': self.box.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["box"] = self.box
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.box = self.box
+        self.object.save()
+        if self.object.file:
+            # Generate hash.
+            self.object.hash = utils.generate_sha256(self.object.file.path)
+            self.object.save()
+        return redirect(self.get_success_url())
+

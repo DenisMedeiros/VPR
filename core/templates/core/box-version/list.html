@@ -6,28 +6,30 @@
 
 {% block 'body' %}
 
+{% if box_versions %}
 <table class="table table-striped">
   <thead>
     <tr>
       <th scope="col">#</th>
       <th scope="col">Name</th>
       <th scope="col">Kind</th>
-      <th scope="col">Description</th>
       <th scope="col">Created At</th>
       <th scope="col">Hash</th>
-      <th scope="col">File</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for version in box_versions %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ version.name }}</td>
-      <td>{{ version.kind }}</td>
-      <td>{{ version.description }}</td>
+      <td><a href="{% url 'core:box-version-edit' box.pk version.pk %}">{{ version.name }}</a></td>
+      <td>{{ version.get_kind_display }}</td>
       <td>{{ version.created_at }}</td>
       <td>{{ version.hash }}</td>
-      <td>{{ version.file }}</td>
+      <td>
+      <a class="badge bg-primary" href="{{ version.file.url }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download"><i data-feather="download"></i></a>
+        <a class="badge bg-danger" href="#" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete"><i data-feather="x-square"></i></a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -55,6 +57,18 @@
     </tr>
   </tfoot>  
 </table>
-
+{% else %}
+<p> There are no versions registered for this box. </p>
+{% endif %}
 <br />
+{% endblock %}
+
+{% block 'js' %}
+<script>
+  // Enable tooltips.
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>      
 {% endblock %}

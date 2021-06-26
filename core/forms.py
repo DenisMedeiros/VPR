@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import Box
+from . import models
 
 class BootstrapForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -13,10 +13,7 @@ class BootstrapForm(forms.Form):
             else:
                 field.widget.attrs['class'] = 'form-control'
             if isinstance(field.widget, forms.widgets.CheckboxInput):
-                field.widget.attrs['class'] += ' form-check-input'
-
-            
-                
+                field.widget.attrs['class'] += ' form-check-input'                
 
 class LoginForm(BootstrapForm):
 
@@ -50,7 +47,7 @@ class LoginForm(BootstrapForm):
 class BoxForm(forms.ModelForm, BootstrapForm):
    
     class Meta:
-        model = Box
+        model = models.Box
         fields = ['name', 'description', 'public', ] 
 
     def save(self, commit=True):
@@ -60,3 +57,24 @@ class BoxForm(forms.ModelForm, BootstrapForm):
         if commit:
             instance.save()
         return instance
+
+class BoxVersionForm(forms.ModelForm, BootstrapForm):
+   
+    class Meta:
+        model = models.BoxVersion
+        fields = ['name', 'kind', 'description', 'file']
+
+
+    def clean_file(self, *args, **kwargs):
+        if not self.files.get('file'):
+            return None
+        return self.files.get('file')
+
+    def save(self, commit=False, *args, **kwargs):
+        self.instance = super().save(*args, **kwargs, commit=False)
+        # If file is None, delete it (the user wanted to remove it).
+        if self.cleaned_data['file'] is None:
+            self.instance.file = None
+        if commit:
+            self.instance.save()            
+        return self.instance

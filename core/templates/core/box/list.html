@@ -6,6 +6,7 @@
 
 {% block 'body' %}
 
+{% if boxes %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -14,18 +15,23 @@
       <th scope="col">Creator</th>
       <th scope="col">Public</th>
       <th scope="col">Downloads</th>
-      <th scope="col">Last Download At</th>
+      <th scope="col">Last Download</th>
+      <th scope="col">Versions</th>
     </tr>
   </thead>
   <tbody>
     {% for box in boxes %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ box.name }}</td>
+      <td><a href="{% url 'core:box-edit' box.id %}">{{ box.name }}</a></td>
       <td>{{ box.creator }}</td>
       <td>{% if box.public %}<i data-feather="check"></i>{% endif %}</td>
       <td>{{ box.downloads }}</td>
       <td>{% if box.last_download_at %}{{ box.last_download_at }}{% endif %}</td>
+      <td>
+        <a class="badge bg-primary" href="{% url 'core:box-version-add' box.id %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add"><i data-feather="plus-square"></i></a>
+        <a class="badge bg-info" href="{% url 'core:box-version-list' box.id %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="List"><i data-feather="list"></i></a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -53,6 +59,18 @@
     </tr>
   </tfoot>  
 </table>
-
+{% else %}
+<p> There are no boxes registered. </p>
+{% endif %}
 <br />
+{% endblock %}
+
+{% block 'js' %}
+<script>
+  // Enable tooltips.
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>      
 {% endblock %}
